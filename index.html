@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IM3 — Presupuesto Familiar de 3 Miembros</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#07090f;--surface:#0f1520;--surface2:#161f30;--surface3:#1c2840;
+  --border:#1e2d45;--border2:#253550;
+  --accent:#00d4aa;--accent2:#0099ff;--accent3:#ff6b35;
+  --text:#e8edf5;--text2:#7a8ba8;--text3:#3d5070;
+  --green:#00e676;--yellow:#ffd740;--red:#ff5252;
+  --r:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(0,212,170,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,.025) 1px,transparent 1px);background-size:48px 48px;pointer-events:none;z-index:0;}
+
+header{position:sticky;top:0;z-index:100;background:rgba(7,9,15,.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;}
+.hinner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;height:58px;gap:12px;}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+.logo-badge{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#07090f;font-family:'Syne',sans-serif;font-weight:800;font-size:13px;padding:3px 9px;border-radius:5px;letter-spacing:.5px;}
+.logo-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--text);}
+.lang-bar{display:flex;gap:4px;flex-wrap:wrap;}
+.lb{background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;padding:3px 8px;border-radius:4px;cursor:pointer;transition:all .18s;}
+.lb:hover,.lb.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,170,.08);}
+
+.page{position:relative;z-index:1;max-width:900px;margin:0 auto;padding:48px 24px 80px;}
+
+.hero-tag{display:inline-block;font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);letter-spacing:2px;text-transform:uppercase;border:1px solid rgba(0,212,170,.25);padding:3px 12px;border-radius:20px;background:rgba(0,212,170,.05);margin-bottom:20px;}
+h1{font-family:'Syne',sans-serif;font-size:clamp(22px,4vw,38px);font-weight:800;line-height:1.2;margin-bottom:20px;}
+h1 .hl{color:var(--accent);}
+
+.mission{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--r);padding:18px 22px;margin-bottom:12px;font-size:14px;line-height:1.8;color:var(--text2);}
+.mission strong{color:var(--text);}
+.mission em{color:var(--accent3);font-style:normal;font-weight:500;}
+.mission2{background:rgba(0,153,255,.05);border:1px solid rgba(0,153,255,.2);border-radius:var(--r);padding:14px 20px;margin-bottom:32px;font-size:13px;line-height:1.7;color:var(--text2);font-style:italic;}
+
+.selector-label{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;display:block;}
+.select-wrap{position:relative;margin-bottom:36px;}
+.select-wrap::after{content:'▾';position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--accent);pointer-events:none;font-size:14px;}
+#capitalSelect{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;padding:13px 40px 13px 16px;outline:none;cursor:pointer;transition:border-color .2s;appearance:none;-webkit-appearance:none;}
+#capitalSelect:focus{border-color:var(--accent);}
+#capitalSelect option{background:var(--surface2);color:var(--text);}
+
+#result{display:none;}
+.country-header{display:flex;align-items:center;gap:14px;margin-bottom:24px;}
+.country-flag{font-size:40px;line-height:1;}
+.country-info h2{font-family:'Syne',sans-serif;font-weight:700;font-size:22px;margin-bottom:2px;}
+.country-info .capital-tag{font-family:'DM Mono',monospace;font-size:12px;color:var(--text2);}
+
+.semaforo-bar{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 18px;margin-bottom:20px;}
+.s-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;}
+.s-text{font-size:13px;color:var(--text2);line-height:1.5;}
+.s-text strong{color:var(--text);display:block;margin-bottom:1px;}
+
+.total-box{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(0,153,255,.08));border:1px solid rgba(0,212,170,.3);border-radius:var(--r);padding:20px 24px;margin-bottom:24px;text-align:center;}
+.total-lbl{font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+.total-num{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(36px,7vw,56px);color:var(--accent);line-height:1;}
+.total-unit{font-family:'DM Mono',monospace;font-size:13px;color:var(--text2);margin-top:4px;}
+.total-note{font-size:11px;color:var(--text3);margin-top:6px;}
+
+.table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:20px;}
+.table-head{display:grid;grid-template-columns:1fr auto;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);}
+.table-head span{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1.2px;}
+.table-head span:last-child{text-align:right;}
+.expense-row{display:grid;grid-template-columns:1fr auto;align-items:center;padding:12px 16px;border-bottom:1px solid rgba(30,45,69,.5);transition:background .15s;}
+.expense-row:last-child{border-bottom:none;}
+.expense-row:hover{background:rgba(255,255,255,.02);}
+.row-left{display:flex;align-items:flex-start;gap:10px;}
+.row-icon{font-size:20px;margin-top:1px;}
+.row-name{font-weight:500;font-size:14px;margin-bottom:2px;}
+.row-sub{font-size:11px;color:var(--text3);}
+.edited-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--accent3);margin-left:5px;vertical-align:middle;}
+.amt-input{background:var(--surface2);border:1px solid var(--border2);border-radius:6px;color:var(--text);font-family:'DM Mono',monospace;font-size:14px;padding:7px 10px;width:110px;text-align:right;outline:none;transition:border-color .18s;}
+.amt-input:focus{border-color:var(--accent);}
+
+.reset-btn{background:transparent;border:1px solid var(--border);color:var(--text2);font-family:'DM Mono',monospace;font-size:11px;padding:8px 16px;border-radius:6px;cursor:pointer;transition:all .18s;width:100%;margin-bottom:32px;}
+.reset-btn:hover{border-color:var(--accent3);color:var(--accent3);}
+
+.sources-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.sources-header{background:var(--surface2);padding:12px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+.sources-header span{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:1.2px;}
+.source-item{display:flex;align-items:flex-start;gap:10px;padding:12px 18px;border-bottom:1px solid rgba(30,45,69,.4);text-decoration:none;transition:background .15s;}
+.source-item:last-child{border-bottom:none;}
+.source-item:hover{background:rgba(0,212,170,.04);}
+.source-num{font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);min-width:20px;margin-top:2px;}
+.source-name{font-size:13px;font-weight:500;color:var(--accent2);margin-bottom:2px;}
+.source-desc{font-size:11px;color:var(--text3);}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:28px 24px;text-align:center;}
+.finner{max-width:600px;margin:0 auto;font-size:12px;color:var(--text3);line-height:1.8;}
+
+@media(max-width:600px){
+  .page{padding:32px 16px 60px;}
+  header{padding:0 16px;}
+  .amt-input{width:88px;font-size:13px;}
+  .lb:nth-child(n+5){display:none;}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hinner">
+    <a class="logo" href="#">
+      <span class="logo-badge">IM3</span>
+      <span class="logo-name" data-i18n="brand">Ingreso Mensual de 3</span>
+    </a>
+    <div class="lang-bar" id="langBar"></div>
+  </div>
+</header>
+
+<div class="page">
+  <div class="hero-tag" data-i18n="tag">Finanzas Personales · 195 Países</div>
+  <h1 data-i18n="h1">¿Cómo reducir la <span class="hl">pobreza familiar</span> en el mundo?</h1>
+
+  <div class="mission">
+    <strong data-i18n="m1">Conociendo el presupuesto IM3:</strong><span data-i18n="m2"> el presupuesto mensual completo de una familia de 3 miembros de clase media en la capital de tu país.</span>
+    <br><br>
+    <em data-i18n="m3">Causa raíz:</em><span data-i18n="m4"> La pobreza familiar comienza cuando los enamorados inician su vida sexual con ingresos insuficientes para sostener una familia. Los métodos anticonceptivos no son 100% seguros — existe siempre una mínima probabilidad de ser padres.</span>
+    <br><br>
+    <strong data-i18n="m5">Solución:</strong><span data-i18n="m6"> Cada pareja debe contar con ingresos que cubran el presupuesto IM3 antes de iniciar su vida sexual, aceptando esa mínima probabilidad de convertirse en familia de 3.</span>
+  </div>
+
+  <div class="mission2" data-i18n="quote">"Desde un punto de vista económico, la vida sexual de un varón debería comenzar cuando sus ingresos mensuales cubran el presupuesto de 3 miembros (papá, mamá e hijo) — aceptando la mínima probabilidad de ser padre aun usando cualquier método anticonceptivo. Así se puede reducir futuras familias pobres en el mundo."</div>
+
+  <span class="selector-label" data-i18n="sel_lbl">Selecciona tu capital:</span>
+  <div class="select-wrap">
+    <select id="capitalSelect" onchange="showCountry(this.value)"></select>
+  </div>
+
+  <div id="result"></div>
+</div>
+
+<footer>
+  <div class="finner">
+    <div style="font-size:20px;margin-bottom:6px;">🌍</div>
+    <strong style="color:var(--text2);">IM3 — Ingreso Mensual de 3 Miembros</strong><br>
+    <span data-i18n="footer">Herramienta educativa de planificación económica familiar para reducir la pobreza en el mundo.</span>
+  </div>
+</footer>
+
+<script>
+const TR={
+  es:{brand:"Ingreso Mensual de 3",tag:"Finanzas Personales · 195 Países",
+    h1:'¿Cómo reducir la <span class="hl">pobreza familiar</span> en el mundo?',
+    m1:"Conociendo el presupuesto IM3:",m2:" el presupuesto mensual completo de una familia de 3 miembros de clase media en la capital de tu país.",
+    m3:"Causa raíz:",m4:" La pobreza familiar comienza cuando los enamorados inician su vida sexual con ingresos insuficientes para sostener una familia. Los métodos anticonceptivos no son 100% seguros — existe siempre una mínima probabilidad de ser padres.",
+    m5:"Solución:",m6:" Cada pareja debe contar con ingresos que cubran el presupuesto IM3 antes de iniciar su vida sexual, aceptando esa mínima probabilidad de convertirse en familia de 3.",
+    quote:'"Desde un punto de vista económico, la vida sexual de un varón debería comenzar cuando sus ingresos mensuales cubran el presupuesto de 3 miembros (papá, mamá e hijo) — aceptando la mínima probabilidad de ser padre aun usando cualquier método anticonceptivo. Así se puede reducir futuras familias pobres en el mundo."',
+    sel_lbl:"Selecciona tu capital:",sel_opt:"— Elige una capital —",footer:"Herramienta educativa de planificación económica familiar para reducir la pobreza en el mundo.",
+    cats:["Alquiler","Alimentación","Transporte","Educación","Salud","Ocio","Ahorro"],
+    subs:["Apartamento 2 habitaciones","Mercado + restaurantes","Transporte público / auto","Colegio + útiles escolares","Seguro médico + medicamentos","Entretenimiento familiar","Fondo de emergencia (10%)"],
+    tlbl:"PRESUPUESTO MENSUAL IM3",tunit:"USD / mes",tnote:"Familia de 3 · Clase media · Incluye alquiler",
+    st:["Costo de vida bajo","Costo de vida moderado","Costo de vida alto"],
+    sd:["Alta accesibilidad económica para clase media.","Accesibilidad media — planificación recomendada.","Alta exigencia económica — planificación estricta necesaria."],
+    reset:"↺ Restablecer valores originales",src_title:"Fuentes de datos utilizadas",
+    col_cat:"Categoría",col_amt:"USD/mes",edited:"modificado"},
+  en:{brand:"Monthly Income of 3",tag:"Personal Finance · 195 Countries",
+    h1:'How to reduce <span class="hl">family poverty</span> worldwide?',
+    m1:"By knowing the IM3 budget:",m2:" the full monthly budget of a middle-class family of 3 in your country's capital.",
+    m3:"Root cause:",m4:" Family poverty begins when couples start sexual life without sufficient income. Contraceptive methods are not 100% safe — there is always a minimal chance of becoming parents.",
+    m5:"Solution:",m6:" Each couple must have income covering the IM3 budget before starting sexual life, accepting that minimal probability.",
+    quote:'"From an economic standpoint, a man\'s sexual life should begin when his monthly income covers the budget for 3 members (father, mother and child) — accepting the minimal probability of becoming a father even when using any contraceptive. This reduces future poor families worldwide."',
+    sel_lbl:"Select your capital:",sel_opt:"— Choose a capital —",footer:"Educational tool for family economic planning to reduce poverty worldwide.",
+    cats:["Rent","Food","Transport","Education","Healthcare","Leisure","Savings"],
+    subs:["2-bedroom apartment","Groceries + dining","Public transport / car","School + supplies","Health insurance + medicine","Family entertainment","Emergency fund (10%)"],
+    tlbl:"IM3 MONTHLY BUDGET",tunit:"USD / month",tnote:"Family of 3 · Middle class · Rent included",
+    st:["Low cost of living","Moderate cost of living","High cost of living"],
+    sd:["High economic accessibility for middle class.","Medium accessibility — planning recommended.","High economic demand — strict planning required."],
+    reset:"↺ Reset to original values",src_title:"Data sources used",
+    col_cat:"Category",col_amt:"USD/mo",edited:"edited"},
+  pt:{brand:"Renda Mensal de 3",tag:"Finanças Pessoais · 195 Países",
+    h1:'Como reduzir a <span class="hl">pobreza familiar</span> no mundo?',
+    m1:"Conhecendo o orçamento IM3:",m2:" o orçamento mensal completo de uma família de 3 membros de classe média na capital do seu país.",
+    m3:"Causa raiz:",m4:" A pobreza familiar começa quando os namorados iniciam a vida sexual com renda insuficiente. Os métodos anticoncepcionais não são 100% seguros.",
+    m5:"Solução:",m6:" Cada casal deve ter renda que cubra o orçamento IM3 antes de iniciar a vida sexual.",
+    quote:'"Do ponto de vista econômico, a vida sexual de um homem deve começar quando sua renda mensal cobrir o orçamento de 3 membros (pai, mãe e filho) — aceitando a probabilidade mínima de se tornar pai mesmo usando qualquer método anticoncepcional."',
+    sel_lbl:"Selecione sua capital:",sel_opt:"— Escolha uma capital —",footer:"Ferramenta educacional de planejamento econômico familiar.",
+    cats:["Aluguel","Alimentação","Transporte","Educação","Saúde","Lazer","Poupança"],
+    subs:["Apartamento 2 quartos","Mercado + restaurantes","Transporte público / carro","Escola + material","Plano de saúde + remédios","Entretenimento familiar","Fundo de emergência (10%)"],
+    tlbl:"ORÇAMENTO MENSAL IM3",tunit:"USD / mês",tnote:"Família de 3 · Classe média · Aluguel incluído",
+    st:["Custo de vida baixo","Custo de vida moderado","Custo de vida alto"],
+    sd:["Alta acessibilidade para classe média.","Acessibilidade média — planejamento recomendado.","Alta exigência econômica — planejamento rigoroso."],
+    reset:"↺ Redefinir valores originais",src_title:"Fontes de dados utilizadas",
+    col_cat:"Categoria",col_amt:"USD/mês",edited:"editado"},
+  fr:{brand:"Revenu Mensuel de 3",tag:"Finances Personnelles · 195 Pays",
+    h1:'Comment réduire la <span class="hl">pauvreté familiale</span> dans le monde ?',
+    m1:"En connaissant le budget IM3 :",m2:" le budget mensuel complet d'une famille de 3 membres de classe moyenne dans la capitale de votre pays.",
+    m3:"Cause principale :",m4:" La pauvreté familiale commence quand les couples commencent leur vie sexuelle avec des revenus insuffisants. Les contraceptifs ne sont pas sûrs à 100%.",
+    m5:"Solution :",m6:" Chaque couple doit avoir des revenus couvrant le budget IM3 avant de commencer sa vie sexuelle.",
+    quote:"\"D'un point de vue économique, la vie sexuelle d'un homme devrait commencer quand ses revenus couvrent le budget de 3 membres (père, mère, enfant) — en acceptant la probabilité minimale de devenir père même avec contraception.\"",
+    sel_lbl:"Sélectionnez votre capitale :",sel_opt:"— Choisissez une capitale —",footer:"Outil éducatif de planification économique familiale.",
+    cats:["Loyer","Alimentation","Transport","Éducation","Santé","Loisirs","Épargne"],
+    subs:["Appartement 2 chambres","Courses + restaurants","Transports / voiture","École + fournitures","Assurance + médicaments","Loisirs familiaux","Fonds d'urgence (10%)"],
+    tlbl:"BUDGET MENSUEL IM3",tunit:"USD / mois",tnote:"Famille de 3 · Classe moyenne · Loyer inclus",
+    st:["Faible coût de la vie","Coût modéré","Coût élevé"],
+    sd:["Haute accessibilité économique.","Accessibilité moyenne — planification recommandée.","Forte exigence — planification stricte requise."],
+    reset:"↺ Réinitialiser les valeurs",src_title:"Sources de données utilisées",
+    col_cat:"Catégorie",col_amt:"USD/mois",edited:"modifié"},
+  zh:{brand:"三人月收入",tag:"个人理财 · 195个国家",
+    h1:'如何减少世界上的<span class="hl">家庭贫困</span>？',
+    m1:"了解IM3预算：",m2:" 您国家首都中产阶级三口之家的完整月度预算。",
+    m3:"根本原因：",m4:" 家庭贫困始于伴侣在收入不足时开始性生活。避孕方法并非100%安全。",
+    m5:"解决方案：",m6:" 每对伴侣在开始性生活之前，收入必须覆盖IM3预算。",
+    quote:'"从经济角度，男性性生活应在月收入能覆盖三人预算（父、母、子）时才开始——即使使用避孕方法，也要接受成为父亲的最小概率。"',
+    sel_lbl:"选择您的首都：",sel_opt:"— 选择首都 —",footer:"减少世界贫困的家庭经济规划教育工具。",
+    cats:["租房","食品","交通","教育","医疗","休闲","储蓄"],
+    subs:["两居室公寓","超市+餐厅","公共交通/汽车","学校+用品","医保+药品","家庭娱乐","应急基金(10%)"],
+    tlbl:"IM3月度预算",tunit:"美元/月",tnote:"三口之家 · 中产阶级 · 含租金",
+    st:["生活成本低","生活成本适中","生活成本高"],
+    sd:["中产阶级经济可达性高。","中等可达性——建议规划。","经济要求高——需严格规划。"],
+    reset:"↺ 重置为原始值",src_title:"所用数据来源",
+    col_cat:"类别",col_amt:"美元/月",edited:"已修改"},
+};
+
+const LANGS=[{c:'es',l:'ES'},{c:'en',l:'EN'},{c:'pt',l:'PT'},{c:'fr',l:'FR'},{c:'zh',l:'中文'}];
+let lang='es';
+function t(k){return TR[lang][k]||TR.es[k]||k;}
+function applyTR(){document.querySelectorAll('[data-i18n]').forEach(el=>{el.innerHTML=t(el.dataset.i18n);});}
+function buildLangBar(){
+  document.getElementById('langBar').innerHTML=LANGS.map(l=>`<button class="lb${l.c===lang?' active':''}" onclick="setLang('${l.c}')">${l.l}</button>`).join('');
+}
+function setLang(c){lang=c;buildLangBar();applyTR();buildSelect();const s=document.getElementById('capitalSelect');if(s.value)showCountry(s.value);}
+
+const ICONS=['🏠','🍽️','🚌','📚','🏥','🎭','💰'];
+
+const DATA=[
+  {f:'🇦🇷',n:'Argentina',c:'Buenos Aires',cur:'ARS',b:[600,350,120,180,100,150,300]},
+  {f:'🇧🇴',n:'Bolivia',c:'Sucre',cur:'BOB',b:[280,200,70,120,60,80,90]},
+  {f:'🇧🇷',n:'Brasil',c:'Brasilia',cur:'BRL',b:[650,380,130,200,120,160,260]},
+  {f:'🇨🇱',n:'Chile',c:'Santiago',cur:'CLP',b:[750,400,140,220,130,180,380]},
+  {f:'🇨🇴',n:'Colombia',c:'Bogotá',cur:'COP',b:[450,280,90,160,90,120,210]},
+  {f:'🇨🇷',n:'Costa Rica',c:'San José',cur:'CRC',b:[680,360,130,190,120,160,360]},
+  {f:'🇨🇺',n:'Cuba',c:'La Habana',cur:'CUP',b:[120,200,50,80,60,70,120]},
+  {f:'🇩🇴',n:'Rep. Dominicana',c:'Santo Domingo',cur:'DOP',b:[500,320,100,170,100,130,280]},
+  {f:'🇪🇨',n:'Ecuador',c:'Quito',cur:'USD',b:[400,270,85,150,80,110,215]},
+  {f:'🇸🇻',n:'El Salvador',c:'San Salvador',cur:'USD',b:[350,250,80,140,75,100,205]},
+  {f:'🇬🇹',n:'Guatemala',c:'Ciudad de Guatemala',cur:'GTQ',b:[300,230,75,130,70,95,200]},
+  {f:'🇭🇳',n:'Honduras',c:'Tegucigalpa',cur:'HNL',b:[280,210,65,120,65,90,120]},
+  {f:'🇭🇹',n:'Haití',c:'Puerto Príncipe',cur:'HTG',b:[200,200,60,100,60,80,100]},
+  {f:'🇯🇲',n:'Jamaica',c:'Kingston',cur:'JMD',b:[480,300,95,160,90,120,255]},
+  {f:'🇲🇽',n:'México',c:'Ciudad de México',cur:'MXN',b:[550,340,110,180,100,140,280]},
+  {f:'🇳🇮',n:'Nicaragua',c:'Managua',cur:'NIO',b:[250,200,65,120,60,80,125]},
+  {f:'🇵🇦',n:'Panamá',c:'Ciudad de Panamá',cur:'PAB',b:[700,380,130,200,120,160,410]},
+  {f:'🇵🇾',n:'Paraguay',c:'Asunción',cur:'PYG',b:[300,220,70,130,70,90,120]},
+  {f:'🇵🇪',n:'Perú',c:'Lima',cur:'PEN',b:[480,300,95,160,90,120,255]},
+  {f:'🇹🇹',n:'Trinidad y Tobago',c:'Puerto España',cur:'TTD',b:[680,360,130,190,120,160,360]},
+  {f:'🇺🇾',n:'Uruguay',c:'Montevideo',cur:'UYU',b:[800,400,140,210,130,170,450]},
+  {f:'🇺🇸',n:'Estados Unidos',c:'Washington D.C.',cur:'USD',b:[2200,700,300,500,400,500,900]},
+  {f:'🇨🇦',n:'Canadá',c:'Ottawa',cur:'CAD',b:[1900,650,280,450,350,450,720]},
+  {f:'🇧🇧',n:'Barbados',c:'Bridgetown',cur:'BBD',b:[1000,500,150,280,160,200,510]},
+  {f:'🇧🇿',n:'Belice',c:'Belmopán',cur:'BZD',b:[450,280,90,160,90,120,210]},
+  {f:'🇬🇾',n:'Guyana',c:'Georgetown',cur:'GYD',b:[400,260,85,150,80,110,215]},
+  {f:'🇸🇷',n:'Surinam',c:'Paramaribo',cur:'SRD',b:[330,240,80,140,75,100,135]},
+  {f:'🇻🇪',n:'Venezuela',c:'Caracas',cur:'VES',b:[120,100,40,60,40,50,50]},
+  {f:'🇦🇬',n:'Antigua y Barbuda',c:"Saint John's",cur:'XCD',b:[900,440,155,240,145,190,430]},
+  {f:'🇧🇸',n:'Bahamas',c:'Nassau',cur:'BSD',b:[1400,600,200,360,200,280,460]},
+  {f:'🇩🇲',n:'Dominica',c:'Roseau',cur:'XCD',b:[500,320,100,170,100,130,280]},
+  {f:'🇬🇩',n:'Granada',c:"Saint George's",cur:'XCD',b:[550,340,110,180,105,140,275]},
+  {f:'🇰🇳',n:'San Cristóbal y Nieves',c:'Basseterre',cur:'XCD',b:[680,360,130,190,120,160,360]},
+  {f:'🇱🇨',n:'Santa Lucía',c:'Castries',cur:'XCD',b:[640,350,125,185,115,155,330]},
+  {f:'🇻🇨',n:'San Vicente y Granadinas',c:'Kingstown',cur:'XCD',b:[550,330,110,175,105,140,290]},
+  {f:'🇦🇱',n:'Albania',c:'Tirana',cur:'ALL',b:[380,240,80,140,75,100,185]},
+  {f:'🇦🇩',n:'Andorra',c:'Andorra la Vella',cur:'EUR',b:[1500,650,200,380,220,300,550]},
+  {f:'🇦🇹',n:'Austria',c:'Viena',cur:'EUR',b:[1700,650,220,420,250,330,630]},
+  {f:'🇧🇾',n:'Bielorrusia',c:'Minsk',cur:'BYR',b:[320,230,75,135,72,98,170]},
+  {f:'🇧🇪',n:'Bélgica',c:'Bruselas',cur:'EUR',b:[1900,700,230,440,260,350,620]},
+  {f:'🇧🇦',n:'Bosnia y Herzegovina',c:'Sarajevo',cur:'BAM',b:[430,270,90,155,85,115,255]},
+  {f:'🇧🇬',n:'Bulgaria',c:'Sofía',cur:'BGN',b:[480,290,95,160,90,120,265]},
+  {f:'🇭🇷',n:'Croacia',c:'Zagreb',cur:'EUR',b:[680,360,130,190,120,160,360]},
+  {f:'🇨🇾',n:'Chipre',c:'Nicosia',cur:'EUR',b:[850,420,150,230,140,190,420]},
+  {f:'🇨🇿',n:'Rep. Checa',c:'Praga',cur:'CZK',b:[950,440,160,250,150,200,450]},
+  {f:'🇩🇰',n:'Dinamarca',c:'Copenhague',cur:'DKK',b:[2300,750,280,520,310,400,940]},
+  {f:'🇪🇪',n:'Estonia',c:'Tallin',cur:'EUR',b:[750,390,135,205,125,165,430]},
+  {f:'🇫🇮',n:'Finlandia',c:'Helsinki',cur:'EUR',b:[2000,700,250,470,280,370,730]},
+  {f:'🇫🇷',n:'Francia',c:'París',cur:'EUR',b:[2100,750,260,490,290,380,730]},
+  {f:'🇩🇪',n:'Alemania',c:'Berlín',cur:'EUR',b:[1900,700,240,450,270,350,690]},
+  {f:'🇬🇷',n:'Grecia',c:'Atenas',cur:'EUR',b:[750,390,135,205,125,165,430]},
+  {f:'🇭🇺',n:'Hungría',c:'Budapest',cur:'HUF',b:[680,360,130,190,120,160,360]},
+  {f:'🇮🇸',n:'Islandia',c:'Reikiavik',cur:'ISK',b:[2600,800,300,580,340,430,950]},
+  {f:'🇮🇪',n:'Irlanda',c:'Dublín',cur:'EUR',b:[2200,760,270,500,300,390,780]},
+  {f:'🇮🇹',n:'Italia',c:'Roma',cur:'EUR',b:[1500,620,200,375,220,290,595]},
+  {f:'🇽🇰',n:'Kosovo',c:'Pristina',cur:'EUR',b:[330,230,75,135,72,98,160]},
+  {f:'🇱🇻',n:'Letonia',c:'Riga',cur:'EUR',b:[640,345,125,185,115,150,340]},
+  {f:'🇱🇮',n:'Liechtenstein',c:'Vaduz',cur:'CHF',b:[2800,850,320,620,370,460,1080]},
+  {f:'🇱🇹',n:'Lituania',c:'Vilna',cur:'EUR',b:[640,345,125,185,115,150,340]},
+  {f:'🇱🇺',n:'Luxemburgo',c:'Luxemburgo',cur:'EUR',b:[2600,800,300,580,340,430,950]},
+  {f:'🇲🇹',n:'Malta',c:'La Valeta',cur:'EUR',b:[900,440,155,240,145,190,430]},
+  {f:'🇲🇩',n:'Moldavia',c:'Chisináu',cur:'MDL',b:[260,200,65,120,62,85,108]},
+  {f:'🇲🇨',n:'Mónaco',c:'Mónaco',cur:'EUR',b:[4500,1000,400,800,500,600,1200]},
+  {f:'🇲🇪',n:'Montenegro',c:'Podgorica',cur:'EUR',b:[430,270,90,155,85,115,255]},
+  {f:'🇳🇱',n:'Países Bajos',c:'Ámsterdam',cur:'EUR',b:[2100,730,260,490,290,380,750]},
+  {f:'🇲🇰',n:'Macedonia del Norte',c:'Skopie',cur:'MKD',b:[370,240,80,140,75,100,195]},
+  {f:'🇳🇴',n:'Noruega',c:'Oslo',cur:'NOK',b:[2800,850,320,630,370,460,1070]},
+  {f:'🇵🇱',n:'Polonia',c:'Varsovia',cur:'PLN',b:[750,390,135,205,125,165,430]},
+  {f:'🇵🇹',n:'Portugal',c:'Lisboa',cur:'EUR',b:[1000,480,160,270,160,210,520]},
+  {f:'🇷🇴',n:'Rumanía',c:'Bucarest',cur:'RON',b:[500,310,100,165,95,130,300]},
+  {f:'🇷🇺',n:'Rusia',c:'Moscú',cur:'RUB',b:[680,360,130,190,120,160,360]},
+  {f:'🇸🇲',n:'San Marino',c:'San Marino',cur:'EUR',b:[1400,600,190,350,200,270,490]},
+  {f:'🇷🇸',n:'Serbia',c:'Belgrado',cur:'RSD',b:[440,270,90,155,85,115,245]},
+  {f:'🇸🇰',n:'Eslovaquia',c:'Bratislava',cur:'EUR',b:[720,375,135,200,122,162,386]},
+  {f:'🇸🇮',n:'Eslovenia',c:'Liubliana',cur:'EUR',b:[850,420,150,230,140,190,420]},
+  {f:'🇪🇸',n:'España',c:'Madrid',cur:'EUR',b:[1200,540,175,310,185,240,550]},
+  {f:'🇸🇪',n:'Suecia',c:'Estocolmo',cur:'SEK',b:[2200,750,270,500,300,390,790]},
+  {f:'🇨🇭',n:'Suiza',c:'Berna',cur:'CHF',b:[3000,900,350,680,400,490,1180]},
+  {f:'🇺🇦',n:'Ucrania',c:'Kiev',cur:'UAH',b:[250,190,65,118,60,82,135]},
+  {f:'🇬🇧',n:'Reino Unido',c:'Londres',cur:'GBP',b:[2300,750,280,520,310,400,940]},
+  {f:'🇻🇦',n:'Ciudad del Vaticano',c:'Ciudad del Vaticano',cur:'EUR',b:[2100,730,260,490,290,380,750]},
+  {f:'🇦🇫',n:'Afganistán',c:'Kabul',cur:'AFN',b:[100,100,35,55,35,45,30]},
+  {f:'🇦🇲',n:'Armenia',c:'Ereván',cur:'AMD',b:[380,240,80,140,75,100,185]},
+  {f:'🇦🇿',n:'Azerbaiyán',c:'Bakú',cur:'AZN',b:[400,250,85,150,80,110,225]},
+  {f:'🇧🇭',n:'Baréin',c:'Manama',cur:'BHD',b:[1400,600,200,360,200,280,460]},
+  {f:'🇧🇩',n:'Bangladés',c:'Daca',cur:'BDT',b:[180,180,55,95,55,70,65]},
+  {f:'🇧🇹',n:'Bután',c:'Timbu',cur:'BTN',b:[300,210,70,130,68,90,132]},
+  {f:'🇧🇳',n:'Brunéi',c:'Bandar Seri Begawan',cur:'BND',b:[1000,500,160,280,160,210,490]},
+  {f:'🇰🇭',n:'Camboya',c:'Nom Pen',cur:'KHR',b:[250,190,65,118,60,82,135]},
+  {f:'🇨🇳',n:'China',c:'Pekín',cur:'CNY',b:[1000,500,160,280,160,210,490]},
+  {f:'🇬🇪',n:'Georgia',c:'Tiflis',cur:'GEL',b:[400,250,85,150,80,110,225]},
+  {f:'🇮🇳',n:'India',c:'Nueva Delhi',cur:'INR',b:[300,210,70,130,68,90,132]},
+  {f:'🇮🇩',n:'Indonesia',c:'Yakarta',cur:'IDR',b:[380,240,80,140,75,100,185]},
+  {f:'🇮🇷',n:'Irán',c:'Teherán',cur:'IRR',b:[220,185,60,110,58,78,89]},
+  {f:'🇮🇶',n:'Irak',c:'Bagdad',cur:'IQD',b:[300,210,70,130,68,90,132]},
+  {f:'🇮🇱',n:'Israel',c:'Jerusalén',cur:'ILS',b:[2100,730,260,490,290,380,750]},
+  {f:'🇯🇵',n:'Japón',c:'Tokio',cur:'JPY',b:[1900,700,230,440,260,350,620]},
+  {f:'🇯🇴',n:'Jordania',c:'Amán',cur:'JOD',b:[680,360,130,190,120,160,360]},
+  {f:'🇰🇿',n:'Kazajistán',c:'Astana',cur:'KZT',b:[480,290,95,160,90,120,265]},
+  {f:'🇰🇼',n:'Kuwait',c:'Ciudad de Kuwait',cur:'KWD',b:[1600,650,210,390,230,310,610]},
+  {f:'🇰🇬',n:'Kirguistán',c:'Biskek',cur:'KGS',b:[220,185,60,110,58,78,89]},
+  {f:'🇱🇦',n:'Laos',c:'Vientián',cur:'LAK',b:[250,190,65,118,60,82,135]},
+  {f:'🇱🇧',n:'Líbano',c:'Beirut',cur:'LBP',b:[300,210,70,130,68,90,132]},
+  {f:'🇲🇾',n:'Malasia',c:'Kuala Lumpur',cur:'MYR',b:[600,340,120,180,110,145,305]},
+  {f:'🇲🇻',n:'Maldivas',c:'Malé',cur:'MVR',b:[900,440,155,240,145,190,430]},
+  {f:'🇲🇳',n:'Mongolia',c:'Ulán Bator',cur:'MNT',b:[380,240,80,140,75,100,185]},
+  {f:'🇲🇲',n:'Myanmar',c:'Naipyidó',cur:'MMK',b:[180,180,55,95,55,70,65]},
+  {f:'🇳🇵',n:'Nepal',c:'Katmandú',cur:'NPR',b:[220,185,60,110,58,78,89]},
+  {f:'🇰🇵',n:'Corea del Norte',c:'Pyongyang',cur:'KPW',b:[150,160,50,85,50,65,40]},
+  {f:'🇴🇲',n:'Omán',c:'Mascate',cur:'OMR',b:[1100,520,170,295,175,225,515]},
+  {f:'🇵🇰',n:'Pakistán',c:'Islamabad',cur:'PKR',b:[220,185,60,110,58,78,89]},
+  {f:'🇵🇸',n:'Palestina',c:'Ramala',cur:'ILS',b:[370,240,80,140,75,100,195]},
+  {f:'🇵🇭',n:'Filipinas',c:'Manila',cur:'PHP',b:[330,230,75,135,72,98,160]},
+  {f:'🇶🇦',n:'Qatar',c:'Doha',cur:'QAR',b:[2300,750,280,520,310,400,940]},
+  {f:'🇸🇦',n:'Arabia Saudita',c:'Riad',cur:'SAR',b:[1600,650,210,390,230,310,610]},
+  {f:'🇸🇬',n:'Singapur',c:'Singapur',cur:'SGD',b:[2600,800,300,580,340,430,950]},
+  {f:'🇱🇰',n:'Sri Lanka',c:'Sri Jayawardenepura Kotte',cur:'LKR',b:[250,190,65,118,60,82,135]},
+  {f:'🇸🇾',n:'Siria',c:'Damasco',cur:'SYP',b:[130,130,45,70,45,55,25]},
+  {f:'🇹🇼',n:'Taiwán',c:'Taipéi',cur:'TWD',b:[1000,500,160,280,160,210,490]},
+  {f:'🇹🇯',n:'Tayikistán',c:'Dusambé',cur:'TJS',b:[180,175,55,92,54,68,76]},
+  {f:'🇹🇭',n:'Tailandia',c:'Bangkok',cur:'THB',b:[480,290,95,160,90,120,265]},
+  {f:'🇹🇱',n:'Timor Oriental',c:'Dili',cur:'USD',b:[220,185,60,110,58,78,89]},
+  {f:'🇹🇲',n:'Turkmenistán',c:'Asjabad',cur:'TMT',b:[250,190,65,118,60,82,135]},
+  {f:'🇹🇷',n:'Turquía',c:'Ankara',cur:'TRY',b:[480,290,95,160,90,120,265]},
+  {f:'🇺🇿',n:'Uzbekistán',c:'Taskent',cur:'UZS',b:[220,185,60,110,58,78,89]},
+  {f:'🇻🇳',n:'Vietnam',c:'Hanói',cur:'VND',b:[330,230,75,135,72,98,160]},
+  {f:'🇾🇪',n:'Yemen',c:'Saná',cur:'YER',b:[130,130,45,70,45,55,25]},
+  {f:'🇰🇷',n:'Corea del Sur',c:'Seúl',cur:'KRW',b:[1400,600,200,360,200,280,460]},
+  {f:'🇩🇿',n:'Argelia',c:'Argel',cur:'DZD',b:[380,240,80,140,75,100,185]},
+  {f:'🇦🇴',n:'Angola',c:'Luanda',cur:'AOA',b:[330,230,75,135,72,98,160]},
+  {f:'🇧🇯',n:'Benín',c:'Porto-Novo',cur:'XOF',b:[180,175,55,92,54,68,76]},
+  {f:'🇧🇼',n:'Botsuana',c:'Gaborone',cur:'BWP',b:[380,240,80,140,75,100,185]},
+  {f:'🇧🇫',n:'Burkina Faso',c:'Uagadugú',cur:'XOF',b:[150,155,48,80,48,62,57]},
+  {f:'🇧🇮',n:'Burundi',c:'Gitega',cur:'BIF',b:[120,130,42,68,43,54,43]},
+  {f:'🇨🇻',n:'Cabo Verde',c:'Praia',cur:'CVE',b:[300,210,70,130,68,90,132]},
+  {f:'🇨🇲',n:'Camerún',c:'Yaundé',cur:'XAF',b:[180,175,55,92,54,68,76]},
+  {f:'🇨🇫',n:'Rep. Centroafricana',c:'Bangui',cur:'XAF',b:[120,130,42,68,43,54,43]},
+  {f:'🇹🇩',n:'Chad',c:'Yamena',cur:'XAF',b:[150,155,48,80,48,62,57]},
+  {f:'🇰🇲',n:'Comoras',c:'Moroni',cur:'KMF',b:[180,175,55,92,54,68,76]},
+  {f:'🇨🇬',n:'Rep. del Congo',c:'Brazzaville',cur:'XAF',b:[220,185,60,110,58,78,89]},
+  {f:'🇨🇩',n:'Rep. Dem. del Congo',c:'Kinshasa',cur:'CDF',b:[150,155,48,80,48,62,57]},
+  {f:'🇩🇯',n:'Yibuti',c:'Yibuti',cur:'DJF',b:[250,190,65,118,60,82,135]},
+  {f:'🇪🇬',n:'Egipto',c:'El Cairo',cur:'EGP',b:[300,210,70,130,68,90,132]},
+  {f:'🇬🇶',n:'Guinea Ecuatorial',c:'Malabo',cur:'XAF',b:[380,240,80,140,75,100,185]},
+  {f:'🇪🇷',n:'Eritrea',c:'Asmara',cur:'ERN',b:[120,130,42,68,43,54,43]},
+  {f:'🇸🇿',n:'Suazilandia',c:'Mbabane',cur:'SZL',b:[250,190,65,118,60,82,135]},
+  {f:'🇪🇹',n:'Etiopía',c:'Adís Abeba',cur:'ETB',b:[180,175,55,92,54,68,76]},
+  {f:'🇬🇦',n:'Gabón',c:'Libreville',cur:'XAF',b:[440,270,90,155,85,115,245]},
+  {f:'🇬🇲',n:'Gambia',c:'Banjul',cur:'GMD',b:[150,155,48,80,48,62,57]},
+  {f:'🇬🇭',n:'Ghana',c:'Acra',cur:'GHS',b:[250,190,65,118,60,82,135]},
+  {f:'🇬🇳',n:'Guinea',c:'Conakri',cur:'GNF',b:[150,155,48,80,48,62,57]},
+  {f:'🇬🇼',n:'Guinea-Bisáu',c:'Bisáu',cur:'XOF',b:[120,130,42,68,43,54,43]},
+  {f:'🇰🇪',n:'Kenia',c:'Nairobi',cur:'KES',b:[300,210,70,130,68,90,132]},
+  {f:'🇱🇸',n:'Lesoto',c:'Maseru',cur:'LSL',b:[180,175,55,92,54,68,76]},
+  {f:'🇱🇷',n:'Liberia',c:'Monrovia',cur:'LRD',b:[150,155,48,80,48,62,57]},
+  {f:'🇱🇾',n:'Libia',c:'Trípoli',cur:'LYD',b:[300,210,70,130,68,90,132]},
+  {f:'🇲🇬',n:'Madagascar',c:'Antananarivo',cur:'MGA',b:[150,155,48,80,48,62,57]},
+  {f:'🇲🇼',n:'Malaui',c:'Lilongüe',cur:'MWK',b:[120,130,42,68,43,54,43]},
+  {f:'🇲🇱',n:'Malí',c:'Bamako',cur:'XOF',b:[150,155,48,80,48,62,57]},
+  {f:'🇲🇷',n:'Mauritania',c:'Nuakchot',cur:'MRU',b:[180,175,55,92,54,68,76]},
+  {f:'🇲🇺',n:'Mauricio',c:'Port Louis',cur:'MUR',b:[480,290,95,160,90,120,265]},
+  {f:'🇲🇦',n:'Marruecos',c:'Rabat',cur:'MAD',b:[380,240,80,140,75,100,185]},
+  {f:'🇲🇿',n:'Mozambique',c:'Maputo',cur:'MZN',b:[180,175,55,92,54,68,76]},
+  {f:'🇳🇦',n:'Namibia',c:'Windhoek',cur:'NAD',b:[330,230,75,135,72,98,160]},
+  {f:'🇳🇪',n:'Níger',c:'Niamey',cur:'XOF',b:[120,130,42,68,43,54,43]},
+  {f:'🇳🇬',n:'Nigeria',c:'Abuya',cur:'NGN',b:[300,210,70,130,68,90,132]},
+  {f:'🇷🇼',n:'Ruanda',c:'Kigali',cur:'RWF',b:[220,185,60,110,58,78,89]},
+  {f:'🇸🇹',n:'Santo Tomé y Príncipe',c:'Santo Tomé',cur:'STN',b:[250,190,65,118,60,82,135]},
+  {f:'🇸🇳',n:'Senegal',c:'Dakar',cur:'XOF',b:[250,190,65,118,60,82,135]},
+  {f:'🇸🇨',n:'Seychelles',c:'Victoria',cur:'SCR',b:[900,440,155,240,145,190,430]},
+  {f:'🇸🇱',n:'Sierra Leona',c:'Freetown',cur:'SLL',b:[150,155,48,80,48,62,57]},
+  {f:'🇸🇴',n:'Somalia',c:'Mogadiscio',cur:'SOS',b:[100,100,35,55,35,45,30]},
+  {f:'🇿🇦',n:'Sudáfrica',c:'Pretoria',cur:'ZAR',b:[480,290,95,160,90,120,265]},
+  {f:'🇸🇸',n:'Sudán del Sur',c:'Yuba',cur:'SSP',b:[120,130,42,68,43,54,43]},
+  {f:'🇸🇩',n:'Sudán',c:'Jartum',cur:'SDG',b:[150,155,48,80,48,62,57]},
+  {f:'🇹🇿',n:'Tanzania',c:'Dodoma',cur:'TZS',b:[220,185,60,110,58,78,89]},
+  {f:'🇹🇬',n:'Togo',c:'Lomé',cur:'XOF',b:[180,175,55,92,54,68,76]},
+  {f:'🇹🇳',n:'Túnez',c:'Túnez',cur:'TND',b:[330,230,75,135,72,98,160]},
+  {f:'🇺🇬',n:'Uganda',c:'Kampala',cur:'UGX',b:[180,175,55,92,54,68,76]},
+  {f:'🇿🇲',n:'Zambia',c:'Lusaka',cur:'ZMW',b:[220,185,60,110,58,78,89]},
+  {f:'🇿🇼',n:'Zimbabue',c:'Harare',cur:'ZWL',b:[180,175,55,92,54,68,76]},
+  {f:'🇦🇺',n:'Australia',c:'Canberra',cur:'AUD',b:[1900,700,230,440,260,350,620]},
+  {f:'🇫🇯',n:'Fiyi',c:'Suva',cur:'FJD',b:[440,270,90,155,85,115,245]},
+  {f:'🇰🇮',n:'Kiribati',c:'Tarawa',cur:'AUD',b:[250,190,65,118,60,82,135]},
+  {f:'🇲🇭',n:'Islas Marshall',c:'Majuro',cur:'USD',b:[380,240,80,140,75,100,185]},
+  {f:'🇫🇲',n:'Micronesia',c:'Palikir',cur:'USD',b:[330,230,75,135,72,98,160]},
+  {f:'🇳🇷',n:'Nauru',c:'Yaren',cur:'AUD',b:[400,250,85,150,80,110,225]},
+  {f:'🇳🇿',n:'Nueva Zelanda',c:'Wellington',cur:'NZD',b:[1700,660,220,410,245,325,640]},
+  {f:'🇵🇼',n:'Palaos',c:'Ngerulmud',cur:'USD',b:[480,290,95,160,90,120,265]},
+  {f:'🇵🇬',n:'Papúa Nueva Guinea',c:'Port Moresby',cur:'PGK',b:[300,210,70,130,68,90,132]},
+  {f:'🇼🇸',n:'Samoa',c:'Apia',cur:'WST',b:[380,240,80,140,75,100,185]},
+  {f:'🇸🇧',n:'Islas Salomón',c:'Honiara',cur:'SBD',b:[250,190,65,118,60,82,135]},
+  {f:'🇹🇴',n:'Tonga',c:'Nukualofa',cur:'TOP',b:[330,230,75,135,72,98,160]},
+  {f:'🇹🇻',n:'Tuvalu',c:'Funafuti',cur:'AUD',b:[300,210,70,130,68,90,132]},
+  {f:'🇻🇺',n:'Vanuatu',c:'Port Vila',cur:'VUV',b:[300,210,70,130,68,90,132]},
+];
+
+const SOURCES=[
+  {name:'Numbeo — Cost of Living',url:'https://www.numbeo.com/cost-of-living/',desc:'Base de datos global de costos de vida por ciudad, reportados y verificados por usuarios locales.'},
+  {name:'Expatistan — Cost of Living Comparison',url:'https://www.expatistan.com/cost-of-living',desc:'Comparador internacional de costos de vida con énfasis en clase media y expatriados.'},
+  {name:'Mercer — Cost of Living Survey',url:'https://www.mercer.com/solutions/workforce-and-careers/global-talent-hr-consulting/cost-of-living-resource-center/',desc:'Encuesta anual de costo de vida global para empresas multinacionales y organismos internacionales.'},
+  {name:'ECA International',url:'https://www.eca-international.com/',desc:'Proveedor líder de datos de compensación y costo de vida internacional para RRHH globales.'},
+  {name:'CEPAL — Estadísticas sociales LATAM',url:'https://estadisticas.cepal.org/',desc:'Comisión Económica para América Latina: indicadores de ingreso familiar y gasto per cápita regional.'},
+  {name:'World Bank — Poverty and Inequality Platform',url:'https://pip.worldbank.org/',desc:'Plataforma del Banco Mundial con datos de pobreza, desigualdad e ingresos por país.'},
+  {name:'IMF — World Economic Outlook Database',url:'https://www.imf.org/en/Publications/WEO',desc:'Base de datos del FMI con PIB per cápita, ingreso disponible y proyecciones económicas por país.'},
+  {name:'Livingcost.org — Monthly Living Cost',url:'https://livingcost.org/',desc:'Estimaciones detalladas del costo de vida mensual por categoría para cientos de ciudades.'},
+];
+
+const edits={};
+function getE(i){if(!edits[i])edits[i]=[...DATA[i].b];return edits[i];}
+function getTotal(i){return getE(i).reduce((a,b)=>a+b,0);}
+
+function buildSelect(){
+  const sel=document.getElementById('capitalSelect');
+  const prev=sel.value;
+  const sorted=[...DATA].map((d,i)=>({...d,i})).sort((a,b)=>a.n.localeCompare(b.n));
+  sel.innerHTML=`<option value="">${t('sel_opt')}</option>`;
+  sorted.forEach(co=>{
+    const opt=document.createElement('option');
+    opt.value=co.i;
+    opt.textContent=`${co.f} ${co.c} — ${co.n}`;
+    sel.appendChild(opt);
+  });
+  if(prev) sel.value=prev;
+}
+
+function showCountry(idx){
+  if(idx===''){document.getElementById('result').style.display='none';return;}
+  idx=parseInt(idx);
+  const co=DATA[idx];
+  const e=getE(idx);
+  const total=getTotal(idx);
+  const T=TR[lang];
+  const sl=total<1200?0:total<3000?1:2;
+  const sc=['var(--green)','var(--yellow)','var(--red)'];
+  const se=['🟢','🟡','🔴'];
+
+  const rows=T.cats.map((cat,i)=>`
+    <div class="expense-row">
+      <div class="row-left">
+        <div class="row-icon">${ICONS[i]}</div>
+        <div>
+          <div class="row-name">${cat}${e[i]!==co.b[i]?'<span class="edited-dot"></span>':''}</div>
+          <div class="row-sub">${T.subs[i]}</div>
+        </div>
+      </div>
+      <input class="amt-input" type="number" min="0" value="${e[i]}" data-idx="${idx}" data-cat="${i}" oninput="updateAmt(this)"/>
+    </div>`).join('');
+
+  const srcItems=SOURCES.map((s,i)=>`
+    <a class="source-item" href="${s.url}" target="_blank" rel="noopener">
+      <span class="source-num">[${i+1}]</span>
+      <div>
+        <div class="source-name">${s.name} ↗</div>
+        <div class="source-desc">${s.desc}</div>
+      </div>
+    </a>`).join('');
+
+  const el=document.getElementById('result');
+  el.style.display='block';
+  el.innerHTML=`
+    <div class="country-header">
+      <div class="country-flag">${co.f}</div>
+      <div class="country-info">
+        <h2>${co.n}</h2>
+        <span class="capital-tag">📍 ${co.c} &nbsp;·&nbsp; ${co.cur}</span>
+      </div>
+    </div>
+    <div class="semaforo-bar">
+      <div class="s-dot" id="sDot" style="background:${sc[sl]};box-shadow:0 0 10px ${sc[sl]};"></div>
+      <div class="s-text">
+        <strong id="sTitle">${se[sl]} ${T.st[sl]}</strong>
+        <span id="sDesc">${T.sd[sl]}</span>
+      </div>
+    </div>
+    <div class="total-box">
+      <div class="total-lbl">${T.tlbl}</div>
+      <div class="total-num" id="totalNum">$${total.toLocaleString()}</div>
+      <div class="total-unit">${T.tunit}</div>
+      <div class="total-note">${T.tnote}</div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-head">
+        <span>${T.col_cat}</span><span>${T.col_amt}</span>
+      </div>
+      <div id="expenseRows">${rows}</div>
+    </div>
+    <button class="reset-btn" onclick="resetEdits(${idx})">${T.reset}</button>
+    <div class="sources-section">
+      <div class="sources-header"><span>🔗 ${T.src_title}</span></div>
+      ${srcItems}
+    </div>`;
+  el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function updateAmt(inp){
+  const idx=parseInt(inp.dataset.idx);
+  const cat=parseInt(inp.dataset.cat);
+  getE(idx)[cat]=Math.max(0,parseInt(inp.value)||0);
+  const total=getTotal(idx);
+  const T=TR[lang];
+  const sl=total<1200?0:total<3000?1:2;
+  const sc=['var(--green)','var(--yellow)','var(--red)'];
+  const se=['🟢','🟡','🔴'];
+  document.getElementById('totalNum').textContent='$'+total.toLocaleString();
+  const dot=document.getElementById('sDot');
+  if(dot){dot.style.background=sc[sl];dot.style.boxShadow='0 0 10px '+sc[sl];}
+  const st=document.getElementById('sTitle');const sd=document.getElementById('sDesc');
+  if(st) st.textContent=se[sl]+' '+T.st[sl];
+  if(sd) sd.textContent=T.sd[sl];
+  // refresh edited dots
+  document.querySelectorAll('.expense-row').forEach((row,i)=>{
+    const d=row.querySelector('.edited-dot');
+    const isEd=getE(idx)[i]!==DATA[idx].b[i];
+    const nm=row.querySelector('.row-name');
+    if(isEd&&!d&&nm){const s=document.createElement('span');s.className='edited-dot';nm.appendChild(s);}
+    else if(!isEd&&d){d.remove();}
+  });
+}
+
+function resetEdits(idx){edits[idx]=[...DATA[idx].b];showCountry(idx);}
+
+buildLangBar();applyTR();buildSelect();
+</script>
+</body>
+</html>
